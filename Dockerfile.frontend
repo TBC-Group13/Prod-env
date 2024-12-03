@@ -1,24 +1,26 @@
-# Use Node.js image as base for React
-FROM node:18
+# Stage 1: Build the React app
+FROM node:18 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json, then install dependencies
+# Copy package.json and package-lock.json first to install dependencies
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 
-# Copy the rest of the React app code
+# Copy the rest of the React app source code
 COPY frontend/ .
 
-# Build the React app
+# Build the React app for production
 RUN npm run build
 
-# Serve the React app using a lightweight web server (nginx)
+# Stage 2: Serve the built React app using Nginx
 FROM nginx:1.23
-COPY --from=0 /app/build /usr/share/nginx/html
+
+# Copy the build files from the previous stage into the Nginx container
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Expose port 80 for React
 EXPOSE 80
 
+# Start Nginx to serve the React app
 CMD ["nginx", "-g", "daemon off;"]
