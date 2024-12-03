@@ -3,21 +3,26 @@ FROM node:18 AS build
 
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to install dependencies
+# Copy package.json and package-lock.json (or yarn.lock)
 COPY frontend/package.json frontend/package-lock.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the React app source code
+# Copy the rest of the frontend files
 COPY frontend/ .
 
-# Build the React app for production
+# Run TypeScript build and Vite build
 RUN npm run build
+
+# Check if build directory exists after build
+RUN ls -la /app/dist  # Vite typically places built files in /dist by default
 
 # Stage 2: Serve the built React app using Nginx
 FROM nginx:1.23
 
 # Copy the build files from the previous stage into the Nginx container
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expose port 80 for React
 EXPOSE 80
