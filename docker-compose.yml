@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    volumes:
+      - ./backend:/app
+      - ./backend/db.sqlite3:/app/db.sqlite3  # Persist SQLite database
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: your_project.settings  # Adjust according to your settings
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - frontend  # Optionally, if you need the frontend up first
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:80"  # Expose React app on port 3000
+    environment:
+      REACT_APP_API_URL: http://localhost:8000  # Pointing to the Django backend
+
