@@ -26,4 +26,3 @@ services:
       - "3000:80"  # Expose React app on port 3000
     environment:
       REACT_APP_API_URL: http://localhost:8000  # Pointing to the Django backend
-

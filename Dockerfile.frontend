@@ -15,9 +15,6 @@ COPY frontend/ .
 # Run TypeScript build and Vite build
 RUN npm run build
 
-# Check if build directory exists after build
-RUN ls -la /app/dist  # Vite typically places built files in /dist by default
-
 # Stage 2: Serve the built React app using Nginx
 FROM nginx:1.23
 
